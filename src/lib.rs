@@ -1,8 +1,9 @@
 mod container;
+mod debug;
 mod query;
 mod root;
 
-#[cfg(test)]
+#[cfg(any(test, doc))]
 mod test;
 
 pub use async_trait::async_trait;

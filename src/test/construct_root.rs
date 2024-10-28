@@ -6,6 +6,21 @@ async fn construct_root() {
     let root = Fin::<Root<GrandParent>>::create(UserData, Key)
         .await
         .unwrap();
-    println!("{:#?}", std::any::type_name_of_val(&root));
-    println!("{:#?}", root);
+
+    assert_ty!(Fin<Root<GrandParent>>, root);
+
+    assert_ty_eq!(
+        Root<GrandParent>,
+        <Fin<Root<GrandParent>> as Container>::Value
+    );
+
+    assert_ty_eq!(
+        Root<GrandParent>,
+        <Fin<Root<GrandParent>> as Container>::Value
+    );
+
+    assert_ty_eq!(
+        <Fin<Root<GrandParent>> as Container>::Value,
+        Root<GrandParent>
+    );
 }

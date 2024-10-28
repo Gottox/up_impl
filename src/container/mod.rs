@@ -10,12 +10,11 @@ where
     Self: Sized,
 {
     type Value: Query;
-    type Output;
 
     async fn create(
         user_data: <Self::Value as Query>::UserData,
         key: <Self::Value as Query>::Key,
-    ) -> Result<Self::Output, <Self::Value as Query>::Error>;
+    ) -> Result<Self, <Self::Value as Query>::Error>;
 }
 
 pub trait HasContainerType {

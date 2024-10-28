@@ -1,9 +1,9 @@
-use std::fmt::Debug;
+use crate::debug::Debug;
 
 use crate::query::Query;
 use async_trait::async_trait;
 
-#[derive(Debug)]
+#[cfg_attr(feature = "debug", derive(Debug))]
 pub struct Root<T>(T);
 
 #[async_trait]

@@ -3,6 +3,10 @@ name = "up_impl"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["debug"]
+debug = []
+
 [dependencies]
 async-trait = "0.1.83"
 either = "1.13.0"
