@@ -1,0 +1,6 @@
+env:
+  RUST_BACKTRACE: "1"
+default:
+  - test
+  - --
+  - --nocapture
