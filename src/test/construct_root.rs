@@ -7,7 +7,7 @@ async fn construct_root() {
         .await
         .unwrap();
 
-    assert_ty!(Fin<Root<GrandParent>>, root);
+    assert_ty!(Root<GrandParent>, root);
 
     assert_ty_eq!(
         Root<GrandParent>,
@@ -17,10 +17,5 @@ async fn construct_root() {
     assert_ty_eq!(
         Root<GrandParent>,
         <Fin<Root<GrandParent>> as Container>::Value
-    );
-
-    assert_ty_eq!(
-        <Fin<Root<GrandParent>> as Container>::Value,
-        Root<GrandParent>
     );
 }

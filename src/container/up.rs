@@ -8,27 +8,33 @@ use super::{Container, HasContainerType};
 impl<V> HasContainerType for V
 where
     V: HasUp<Up: HasContainerType> + Debug,
-    <V::Up as HasContainerType>::ContainerType: Container + Debug,
+    <V::Up as HasContainerType>::ContainerType: Container,
+    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
 {
     type ContainerType = Up<V>;
 }
-
-#[cfg_attr(feature = "debug", derive(Debug))]
+#[derive(Debug)]
 pub struct Up<V>
 where
     V: HasUp<Up: HasContainerType> + Debug,
-    <V::Up as HasContainerType>::ContainerType: Container + Debug,
+    <V::Up as HasContainerType>::ContainerType: Container,
+    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
 {
     pub value: V,
-    pub up: <V::Up as HasContainerType>::ContainerType,
+    pub up: <<V::Up as HasContainerType>::ContainerType as Container>::Output,
 }
-
 #[async_trait]
 impl<V> Container for Up<V>
 where
-    V: HasUp + Debug + HasContainerType + Query + Send + Sync,
+    V: HasUp<Up: HasContainerType>
+        + Debug
+        + HasContainerType
+        + Query
+        + Send
+        + Sync,
     <V::Up as HasContainerType>::ContainerType:
         Debug + Container<Value = V::Up>,
+    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
     V::Up: Query<UserData = V::UserData, Key = V::UpKey, Error = V::Error>
         + Debug
         + HasContainerType,
@@ -37,6 +43,7 @@ where
     V::Key: Send + Sync,
 {
     type Value = V;
+    type Output = Self;
 
     async fn create(
         user_data: <Self::Value as Query>::UserData,
