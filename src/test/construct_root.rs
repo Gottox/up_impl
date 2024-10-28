@@ -11,11 +11,11 @@ async fn construct_root() {
 
     assert_ty_eq!(
         Root<GrandParent>,
-        <Fin<Root<GrandParent>> as Container>::Value
+        <Fin<Root<GrandParent>> as Container>::Output
     );
 
     assert_ty_eq!(
         Root<GrandParent>,
-        <Fin<Root<GrandParent>> as Container>::Value
+        <Fin<Root<GrandParent>> as Container>::Output
     );
 }

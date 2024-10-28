@@ -16,13 +16,16 @@ where
     V::UserData: Send + Sync,
     V::Key: Send + Sync,
 {
-    type Value = V;
+    type Error = V::Error;
+    type Key = V::Key;
+    type UserData = V::UserData;
+
     type Output = V;
 
     async fn create(
-        user_data: <Self::Value as Query>::UserData,
-        key: <Self::Value as Query>::Key,
-    ) -> Result<Self::Output, <Self::Value as Query>::Error> {
+        user_data: Self::UserData,
+        key: Self::Key,
+    ) -> Result<Self::Output, Self::Error> {
         V::query(user_data, key).await
     }
 }

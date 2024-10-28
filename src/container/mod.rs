@@ -9,13 +9,15 @@ pub trait Container
 where
     Self: Sized,
 {
-    type Value: Query;
+    type Error;
+    type Key;
+    type UserData;
     type Output;
 
     async fn create(
-        user_data: <Self::Value as Query>::UserData,
-        key: <Self::Value as Query>::Key,
-    ) -> Result<Self::Output, <Self::Value as Query>::Error>;
+        user_data: Self::UserData,
+        key: Self::Key,
+    ) -> Result<Self::Output, Self::Error>;
 }
 
 pub trait HasContainerType {

@@ -26,14 +26,18 @@ where
 #[async_trait]
 impl<V> Container for Up<V>
 where
-    V: HasUp<Up: HasContainerType>
+    V: HasUp<Up: HasContainerType, UpKey = <V as Query>::Key>
         + Debug
         + HasContainerType
         + Query
         + Send
         + Sync,
-    <V::Up as HasContainerType>::ContainerType:
-        Debug + Container<Value = V::Up>,
+    <V::Up as HasContainerType>::ContainerType: Debug
+        + Container<
+            UserData = <V as Query>::UserData,
+            Key = <V as Query>::Key,
+            Error = <V as Query>::Error,
+        >,
     <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
     V::Up: Query<UserData = V::UserData, Key = V::UpKey, Error = V::Error>
         + Debug
@@ -42,13 +46,15 @@ where
     V::UserData: Send + Sync + Clone,
     V::Key: Send + Sync,
 {
-    type Value = V;
+    type Error = <V as Query>::Error;
+    type Key = <V as Query>::Key;
+    type UserData = <V as Query>::UserData;
     type Output = Self;
 
     async fn create(
-        user_data: <Self::Value as Query>::UserData,
-        key: <Self::Value as Query>::Key,
-    ) -> Result<Self, <Self::Value as Query>::Error> {
+        user_data: Self::UserData,
+        key: Self::Key,
+    ) -> Result<Self, Self::Error> {
         let value = V::query(user_data.clone(), key).await?;
         let up = <<V as HasUp>::Up as HasContainerType>::ContainerType::create(
             user_data,
