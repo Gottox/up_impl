@@ -1,12 +1,12 @@
 use crate::{query::Query, root::Root};
 use async_trait::async_trait;
+use std::fmt::Debug;
 
 use super::{Container, HasContainerType};
 
 impl<T> HasContainerType for Root<T> {
     type ContainerType = Fin<Root<T>>;
 }
-#[cfg_attr(feature = "debug", derive(Debug))]
 pub struct Fin<V>(V);
 #[async_trait]
 impl<V> Container for Fin<V>

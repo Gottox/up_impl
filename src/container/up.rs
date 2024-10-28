@@ -1,24 +1,20 @@
-use crate::debug::Debug;
-
 use crate::{query::Query, HasUp};
 use async_trait::async_trait;
+use std::fmt::Debug;
 
 use super::{Container, HasContainerType};
 
 impl<V> HasContainerType for V
 where
-    V: HasUp<Up: HasContainerType> + Debug,
+    V: HasUp<Up: HasContainerType>,
     <V::Up as HasContainerType>::ContainerType: Container,
-    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
 {
     type ContainerType = Up<V>;
 }
-#[derive(Debug)]
 pub struct Up<V>
 where
-    V: HasUp<Up: HasContainerType> + Debug,
+    V: HasUp<Up: HasContainerType>,
     <V::Up as HasContainerType>::ContainerType: Container,
-    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
 {
     pub value: V,
     pub up: <<V::Up as HasContainerType>::ContainerType as Container>::Output,
@@ -27,20 +23,16 @@ where
 impl<V> Container for Up<V>
 where
     V: HasUp<Up: HasContainerType, UpKey = <V as Query>::Key>
-        + Debug
         + HasContainerType
         + Query
         + Send
         + Sync,
-    <V::Up as HasContainerType>::ContainerType: Debug
-        + Container<
-            UserData = <V as Query>::UserData,
-            Key = <V as Query>::Key,
-            Error = <V as Query>::Error,
-        >,
-    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
+    <V::Up as HasContainerType>::ContainerType: Container<
+        UserData = <V as Query>::UserData,
+        Key = <V as Query>::Key,
+        Error = <V as Query>::Error,
+    >,
     V::Up: Query<UserData = V::UserData, Key = V::UpKey, Error = V::Error>
-        + Debug
         + HasContainerType,
     V::Error: Send + Sync,
     V::UserData: Send + Sync + Clone,
@@ -63,5 +55,19 @@ where
         .await?;
 
         Ok(Self { value, up })
+    }
+}
+
+impl<V> Debug for Up<V>
+where
+    V: Debug,
+    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
+    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Up")
+            .field("value", &self.value)
+            .field("up", &self.up)
+            .finish()
     }
 }

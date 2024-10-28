@@ -1,9 +1,7 @@
-use crate::debug::Debug;
-
 use crate::query::Query;
 use async_trait::async_trait;
+use std::fmt::Debug;
 
-#[cfg_attr(feature = "debug", derive(Debug))]
 pub struct Root<T>(T);
 
 #[async_trait]
@@ -23,5 +21,14 @@ where
         key: Self::Key,
     ) -> Result<Self, Self::Error> {
         T::query(user_data, key).await.map(Root)
+    }
+}
+
+impl<T> Debug for Root<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Root").field(&self.0).finish()
     }
 }
