@@ -32,8 +32,7 @@ where
         Key = <V as Query>::Key,
         Error = <V as Query>::Error,
     >,
-    V::Up: Query<UserData = V::UserData, Key = V::UpKey, Error = V::Error>
-        + HasContainerType,
+    V::Up: HasContainerType,
     V::Error: Send + Sync,
     V::UserData: Send + Sync + Clone,
     V::Key: Send + Sync,
