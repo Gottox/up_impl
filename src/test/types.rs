@@ -34,6 +34,19 @@ impl HasUp for Father {
         Key
     }
 }
+#[async_trait]
+impl Query for Father {
+    type UserData = UserData;
+    type Error = std::io::Error;
+    type Key = Key;
+
+    async fn query(
+        _: Self::UserData,
+        _: Self::Key,
+    ) -> Result<Self, std::io::Error> {
+        Ok(Self)
+    }
+}
 
 #[derive(Debug)]
 pub struct Mother;
@@ -63,9 +76,22 @@ impl Query for Mother {
 pub struct Child;
 impl HasUp for Child {
     type Up = Either<Father, Mother>;
-    type UpKey = Key;
+    type UpKey = Either<Key, Key>;
 
     fn key(&self) -> Self::UpKey {
-        Key
+        Either::Right(Key)
+    }
+}
+#[async_trait]
+impl Query for Child {
+    type UserData = UserData;
+    type Error = std::io::Error;
+    type Key = Key;
+
+    async fn query(
+        _: Self::UserData,
+        _: Self::Key,
+    ) -> Result<Self, std::io::Error> {
+        Ok(Self)
     }
 }

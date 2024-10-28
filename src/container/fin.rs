@@ -1,6 +1,5 @@
 use crate::{query::Query, root::Root};
 use async_trait::async_trait;
-use std::fmt::Debug;
 
 use super::{Container, HasContainerType};
 
