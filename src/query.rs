@@ -8,5 +8,8 @@ where
     type UserData;
     type Error;
     type Key;
-    async fn query(user_data: Self::UserData, key: Self::Key) -> Result<Self, Self::Error>;
+    async fn query(
+        user_data: Self::UserData,
+        key: Self::Key,
+    ) -> Result<Self, Self::Error>;
 }
