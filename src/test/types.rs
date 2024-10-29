@@ -14,7 +14,7 @@
 use async_trait::async_trait;
 use either::Either;
 
-use crate::{query::Query, root::Root, HasUp};
+use crate::{query::Query, root::Root, HasQuery, HasUp};
 
 #[derive(Debug)]
 pub struct UserData;
@@ -31,24 +31,13 @@ pub struct GrandParentKey;
 #[derive(Debug)]
 pub struct ChildKey;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct GrandParent;
-
-#[async_trait]
-impl Query for GrandParent {
-    type UserData = UserData;
-    type Error = std::io::Error;
-    type Key = GrandParentKey;
-
-    async fn query(
-        _: Self::Key,
-        _: &Self::UserData,
-    ) -> Result<Self, std::io::Error> {
-        Ok(Self)
-    }
+impl HasQuery for GrandParent {
+    type Query = FamilyTreeQuery<GrandParentKey, Self>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Father;
 impl HasUp for Father {
     type Up = Root<GrandParent>;
@@ -58,21 +47,11 @@ impl HasUp for Father {
         GrandParentKey
     }
 }
-#[async_trait]
-impl Query for Father {
-    type UserData = UserData;
-    type Error = std::io::Error;
-    type Key = FatherKey;
-
-    async fn query(
-        _: Self::Key,
-        _: &Self::UserData,
-    ) -> Result<Self, std::io::Error> {
-        Ok(Self)
-    }
+impl HasQuery for Father {
+    type Query = FamilyTreeQuery<FatherKey, Self>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Mother;
 impl HasUp for Mother {
     type Up = Root<GrandParent>;
@@ -82,21 +61,11 @@ impl HasUp for Mother {
         GrandParentKey
     }
 }
-#[async_trait]
-impl Query for Mother {
-    type UserData = UserData;
-    type Error = std::io::Error;
-    type Key = MotherKey;
-
-    async fn query(
-        _: Self::Key,
-        _: &Self::UserData,
-    ) -> Result<Self, std::io::Error> {
-        Ok(Self)
-    }
+impl HasQuery for Mother {
+    type Query = FamilyTreeQuery<MotherKey, Self>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Child;
 impl HasUp for Child {
     type Up = Either<Father, Mother>;
@@ -106,16 +75,26 @@ impl HasUp for Child {
         Either::Right(MotherKey)
     }
 }
+impl HasQuery for Child {
+    type Query = FamilyTreeQuery<ChildKey, Self>;
+}
+
+pub struct FamilyTreeQuery<K, O>(K, O);
 #[async_trait]
-impl Query for Child {
+impl<K, O> Query for FamilyTreeQuery<K, O>
+where
+    K: Send + Sync,
+    O: Default,
+{
     type UserData = UserData;
     type Error = std::io::Error;
-    type Key = ChildKey;
+    type Key = K;
+    type Output = O;
 
     async fn query(
         _: Self::Key,
         _: &Self::UserData,
-    ) -> Result<Self, std::io::Error> {
-        Ok(Self)
+    ) -> Result<Self::Output, std::io::Error> {
+        Ok(O::default())
     }
 }

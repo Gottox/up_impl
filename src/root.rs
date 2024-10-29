@@ -1,4 +1,4 @@
-use crate::query::Query;
+use crate::query::{HasQuery, Query};
 use async_trait::async_trait;
 use std::{
     fmt::Debug,
@@ -7,23 +7,28 @@ use std::{
 
 pub struct Root<T>(pub T);
 
+impl<T> HasQuery for Root<T> {
+    type Query = Self;
+}
 #[async_trait]
 impl<T> Query for Root<T>
 where
-    T: Query + Send + Sync,
-    T::Error: Send + Sync,
-    T::UserData: Send + Sync,
-    T::Key: Send + Sync,
+    T: HasQuery,
+    T::Query: Query<Output = T> + Send + Sync,
+    <T::Query as Query>::Error: Send + Sync,
+    <T::Query as Query>::UserData: Send + Sync,
+    <T::Query as Query>::Key: Send + Sync,
 {
-    type UserData = T::UserData;
-    type Error = T::Error;
-    type Key = T::Key;
+    type UserData = <T::Query as Query>::UserData;
+    type Error = <T::Query as Query>::Error;
+    type Key = <T::Query as Query>::Key;
+    type Output = Self;
 
     async fn query(
         key: Self::Key,
         user_data: &Self::UserData,
     ) -> Result<Self, Self::Error> {
-        T::query(key, user_data).await.map(Root)
+        T::Query::query(key, user_data).await.map(Root)
     }
 }
 

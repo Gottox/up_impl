@@ -10,22 +10,8 @@ pub use types::*;
 #[macro_export]
 macro_rules! assert_ty_eq {
     ($e:ty, $a:ty) => {{
-        __assert_ty_eq!($e, $a, stringify!($e), stringify!($a));
+        assert_ty_eq!($e, $a, stringify!($e), stringify!($a));
     }};
-}
-
-#[macro_export]
-macro_rules! assert_ty {
-    ($e:ty, $a:expr) => {{
-        fn assert_ty<E: 'static, A: 'static>(_a: &A) {
-            __assert_ty_eq!(E, A, stringify!($e), stringify!($a));
-        }
-        assert_ty::<$e, _>(&$a);
-    }};
-}
-
-#[macro_export]
-macro_rules! __assert_ty_eq {
     ($e:ty, $a:ty, $ee:expr, $ae:expr) => {{
         fn assert_ty<E: 'static, A: 'static>() {
             assert_eq!(
@@ -46,6 +32,16 @@ macro_rules! __assert_ty_eq {
         assert_ty::<$e, $a>();
     }};
 }
-pub(crate) use __assert_ty_eq;
+
+#[macro_export]
+macro_rules! assert_ty {
+    ($e:ty, $a:expr) => {{
+        fn assert_ty<E: 'static, A: 'static>(_a: &A) {
+            assert_ty_eq!(E, A, stringify!($e), stringify!($a));
+        }
+        assert_ty::<$e, _>(&$a);
+    }};
+}
+
 pub(crate) use assert_ty;
 pub(crate) use assert_ty_eq;

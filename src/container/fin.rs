@@ -1,4 +1,4 @@
-use crate::{query::Query, root::Root};
+use crate::{query::HasQuery, root::Root, Query};
 use async_trait::async_trait;
 
 use super::{Container, HasContainerType};
@@ -10,14 +10,15 @@ pub struct Fin<V>(V);
 #[async_trait]
 impl<V> Container for Fin<V>
 where
-    V: Query,
-    V::Error: Send + Sync,
-    V::UserData: Send + Sync,
-    V::Key: Send + Sync,
+    V: HasQuery,
+    V::Query: Query<Output = V>,
+    <V::Query as Query>::Error: Send + Sync,
+    <V::Query as Query>::UserData: Send + Sync,
+    <V::Query as Query>::Key: Send + Sync,
 {
-    type Error = V::Error;
-    type Key = V::Key;
-    type UserData = V::UserData;
+    type Error = <V::Query as Query>::Error;
+    type Key = <V::Query as Query>::Key;
+    type UserData = <V::Query as Query>::UserData;
 
     type Output = V;
 
@@ -25,6 +26,6 @@ where
         user_data: Self::UserData,
         key: K,
     ) -> Result<Self::Output, Self::Error> {
-        V::query(key.into(), &user_data).await
+        <V::Query as Query>::query(key.into(), &user_data).await
     }
 }
