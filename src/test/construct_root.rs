@@ -13,9 +13,4 @@ async fn construct_root() {
         Root<GrandParent>,
         <Fin<Root<GrandParent>> as Container>::Output
     );
-
-    assert_ty_eq!(
-        Root<GrandParent>,
-        <Fin<Root<GrandParent>> as Container>::Output
-    );
 }

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{container::up::Up, container::Container, root::Root};
+use crate::{container::up::Up, container::Container};
 
 #[tokio::test]
 async fn construct_up() {
