@@ -1,3 +1,16 @@
+//! Constructs Directed Acyclic Graphs (DAGs) of a family tree.
+//!
+//! ```text
+//!       GrandParent
+//!        /      \
+//!       /        \
+//!      /          \
+//!    Father     Mother
+//!      \          /
+//!       \        /
+//!        \      /
+//!         Child
+//! ```
 use async_trait::async_trait;
 use either::Either;
 
