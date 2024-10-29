@@ -9,7 +9,7 @@ where
     type Error;
     type Key;
     async fn query(
-        user_data: Self::UserData,
         key: Self::Key,
+        user_data: &Self::UserData,
     ) -> Result<Self, Self::Error>;
 }

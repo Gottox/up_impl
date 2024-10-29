@@ -30,7 +30,7 @@ where
         Error = <V as Query>::Error,
     >,
     V::Error: Send + Sync,
-    V::UserData: Send + Sync + Clone,
+    V::UserData: Send + Sync,
     V::Key: Send + Sync,
     V::UpKey: Send + Sync,
 {
@@ -43,7 +43,7 @@ where
         user_data: Self::UserData,
         key: K,
     ) -> Result<Self, Self::Error> {
-        let value = V::query(user_data.clone(), key.into()).await?;
+        let value = V::query(key.into(), &user_data).await?;
         let up = <<V as HasUp>::Up as HasContainerType>::ContainerType::create(
             user_data,
             value.key(),

@@ -16,23 +16,24 @@ use either::Either;
 
 use crate::{query::Query, root::Root, HasUp};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct UserData;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MotherKey;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FatherKey;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct GrandParentKey;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ChildKey;
 
 #[derive(Debug)]
 pub struct GrandParent;
+
 #[async_trait]
 impl Query for GrandParent {
     type UserData = UserData;
@@ -40,8 +41,8 @@ impl Query for GrandParent {
     type Key = GrandParentKey;
 
     async fn query(
-        _: Self::UserData,
         _: Self::Key,
+        _: &Self::UserData,
     ) -> Result<Self, std::io::Error> {
         Ok(Self)
     }
@@ -64,8 +65,8 @@ impl Query for Father {
     type Key = FatherKey;
 
     async fn query(
-        _: Self::UserData,
         _: Self::Key,
+        _: &Self::UserData,
     ) -> Result<Self, std::io::Error> {
         Ok(Self)
     }
@@ -88,8 +89,8 @@ impl Query for Mother {
     type Key = MotherKey;
 
     async fn query(
-        _: Self::UserData,
         _: Self::Key,
+        _: &Self::UserData,
     ) -> Result<Self, std::io::Error> {
         Ok(Self)
     }
@@ -112,8 +113,8 @@ impl Query for Child {
     type Key = ChildKey;
 
     async fn query(
-        _: Self::UserData,
         _: Self::Key,
+        _: &Self::UserData,
     ) -> Result<Self, std::io::Error> {
         Ok(Self)
     }

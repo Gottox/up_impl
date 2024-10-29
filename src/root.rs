@@ -17,10 +17,10 @@ where
     type Key = T::Key;
 
     async fn query(
-        user_data: Self::UserData,
         key: Self::Key,
+        user_data: &Self::UserData,
     ) -> Result<Self, Self::Error> {
-        T::query(user_data, key).await.map(Root)
+        T::query(key, user_data).await.map(Root)
     }
 }
 

@@ -25,6 +25,6 @@ where
         user_data: Self::UserData,
         key: K,
     ) -> Result<Self::Output, Self::Error> {
-        V::query(user_data, key.into()).await
+        V::query(key.into(), &user_data).await
     }
 }
