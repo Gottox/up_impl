@@ -1,6 +1,7 @@
 mod types;
 
 mod construct_branch;
+mod construct_full;
 mod construct_root;
 mod construct_up;
 

@@ -4,9 +4,10 @@ use either::Either;
 
 #[tokio::test]
 async fn construct_branch() {
-    let parents = Branch::<Mother, Father>::create(UserData, Either::Left(Key))
-        .await
-        .unwrap();
+    let parents =
+        Branch::<Mother, Father>::create(UserData, Either::Left(MotherKey))
+            .await
+            .unwrap();
     assert_ty!(Either<Up<Mother>, Up<Father>>, parents);
     assert!(parents.left().is_some());
 }

@@ -22,17 +22,13 @@ where
 #[async_trait]
 impl<V> Container for Up<V>
 where
-    V: HasUp<Up: HasContainerType, UpKey = <V as Query>::Key>
-        + HasContainerType
-        + Query
-        + Send
-        + Sync,
+    V: HasUp + HasContainerType + Query + Send + Sync,
+    V::Up: HasContainerType,
     <V::Up as HasContainerType>::ContainerType: Container<
         UserData = <V as Query>::UserData,
-        Key = <V as Query>::Key,
+        Key = <V as HasUp>::UpKey,
         Error = <V as Query>::Error,
     >,
-    V::Up: HasContainerType,
     V::Error: Send + Sync,
     V::UserData: Send + Sync + Clone,
     V::Key: Send + Sync,
