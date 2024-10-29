@@ -1,6 +1,9 @@
 use crate::{query::Query, HasUp};
 use async_trait::async_trait;
-use std::fmt::Debug;
+use std::{
+    fmt::Debug,
+    ops::{Deref, DerefMut},
+};
 
 use super::{Container, HasContainerType};
 
@@ -65,5 +68,25 @@ where
             .field("value", &self.value)
             .field("up", &self.up)
             .finish()
+    }
+}
+
+impl<V> Deref for Up<V>
+where
+    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
+{
+    type Target = V;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+impl<V> DerefMut for Up<V>
+where
+    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
     }
 }
