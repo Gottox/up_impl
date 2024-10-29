@@ -14,9 +14,9 @@ where
     type UserData;
     type Output;
 
-    async fn create(
+    async fn create<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
-        key: Self::Key,
+        key: K,
     ) -> Result<Self::Output, Self::Error>;
 }
 

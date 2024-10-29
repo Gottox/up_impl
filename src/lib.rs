@@ -8,6 +8,7 @@ mod test;
 pub use async_trait::async_trait;
 pub use container::fin::*;
 pub use container::up::*;
+pub use query::*;
 
 pub trait HasUp {
     type Up;

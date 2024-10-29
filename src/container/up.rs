@@ -32,17 +32,18 @@ where
     V::Error: Send + Sync,
     V::UserData: Send + Sync + Clone,
     V::Key: Send + Sync,
+    V::UpKey: Send + Sync,
 {
     type Error = <V as Query>::Error;
     type Key = <V as Query>::Key;
     type UserData = <V as Query>::UserData;
     type Output = Self;
 
-    async fn create(
+    async fn create<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
-        key: Self::Key,
+        key: K,
     ) -> Result<Self, Self::Error> {
-        let value = V::query(user_data.clone(), key).await?;
+        let value = V::query(user_data.clone(), key.into()).await?;
         let up = <<V as HasUp>::Up as HasContainerType>::ContainerType::create(
             user_data,
             value.key(),

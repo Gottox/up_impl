@@ -21,10 +21,10 @@ where
 
     type Output = V;
 
-    async fn create(
+    async fn create<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
-        key: Self::Key,
+        key: K,
     ) -> Result<Self::Output, Self::Error> {
-        V::query(user_data, key).await
+        V::query(user_data, key.into()).await
     }
 }

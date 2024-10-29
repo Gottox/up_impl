@@ -42,12 +42,12 @@ where
         <R::ContainerType as Container>::Output,
     >;
 
-    async fn create(
+    async fn create<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
-        key: Self::Key,
+        key: K,
     ) -> Result<Self::Output, Self::Error> {
         use Either::*;
-        match key {
+        match key.into() {
             Left(l) => L::ContainerType::create(user_data, l).await.map(Left),
             Right(r) => R::ContainerType::create(user_data, r).await.map(Right),
         }
