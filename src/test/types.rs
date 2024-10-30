@@ -19,26 +19,26 @@ use crate::{query::Query, root::Root, HasQuery, HasUp};
 #[derive(Debug)]
 pub struct UserData;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct MotherKey;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct FatherKey;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct GrandParentKey;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct ChildKey;
 
-#[derive(Debug, Default)]
-pub struct GrandParent;
+#[derive(Debug, Default, Clone)]
+pub struct GrandParent(GrandParentKey);
 impl HasQuery for GrandParent {
     type Query = FamilyTreeQuery<GrandParentKey, Self>;
 }
 
 #[derive(Debug, Default)]
-pub struct Father;
+pub struct Father(FatherKey);
 impl HasUp for Father {
     type Up = Root<GrandParent>;
     type UpKey = GrandParentKey;
@@ -52,27 +52,32 @@ impl HasQuery for Father {
 }
 
 #[derive(Debug, Default)]
-pub struct Mother;
+pub struct Mother(GrandParentKey);
 impl HasUp for Mother {
     type Up = Root<GrandParent>;
     type UpKey = GrandParentKey;
 
     fn key(&self) -> Self::UpKey {
-        GrandParentKey
+        self.0.clone()
     }
 }
 impl HasQuery for Mother {
     type Query = FamilyTreeQuery<MotherKey, Self>;
 }
 
-#[derive(Debug, Default)]
-pub struct Child;
+#[derive(Debug)]
+pub struct Child(Either<FatherKey, MotherKey>);
 impl HasUp for Child {
     type Up = Either<Father, Mother>;
     type UpKey = Either<FatherKey, MotherKey>;
 
     fn key(&self) -> Self::UpKey {
-        Either::Right(MotherKey)
+        self.0.clone()
+    }
+}
+impl Default for Child {
+    fn default() -> Self {
+        Child(Either::Right(MotherKey))
     }
 }
 impl HasQuery for Child {

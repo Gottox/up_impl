@@ -3,7 +3,7 @@ use crate::{container::Container, root::Root, Fin};
 
 #[tokio::test]
 async fn construct_root() {
-    let root = Fin::<Root<GrandParent>>::create(UserData, GrandParentKey)
+    let root = Fin::<Root<GrandParent>>::with_key(UserData, GrandParentKey)
         .await
         .unwrap();
 

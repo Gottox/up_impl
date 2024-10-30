@@ -40,6 +40,8 @@ where
     >,
     <L::Query as Query>::Key: Send + Sync,
     <R::Query as Query>::Key: Send + Sync,
+    <L::ContainerType as Container>::Inner: Send + Sync,
+    <R::ContainerType as Container>::Inner: Send + Sync,
     <L::Query as Query>::UserData: Send + Sync,
 {
     type Error = <L::Query as Query>::Error;
@@ -49,15 +51,32 @@ where
         <L::ContainerType as Container>::Output,
         <R::ContainerType as Container>::Output,
     >;
+    type Inner = Either<
+        <L::ContainerType as Container>::Inner,
+        <R::ContainerType as Container>::Inner,
+    >;
 
-    async fn create<K: Into<Self::Key> + Send + Sync>(
+    async fn with_key<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
         key: K,
     ) -> Result<Self::Output, Self::Error> {
         use Either::*;
         match key.into() {
-            Left(l) => L::ContainerType::create(user_data, l).await.map(Left),
-            Right(r) => R::ContainerType::create(user_data, r).await.map(Right),
+            Left(l) => L::ContainerType::with_key(user_data, l).await.map(Left),
+            Right(r) => {
+                R::ContainerType::with_key(user_data, r).await.map(Right)
+            }
+        }
+    }
+
+    async fn with(
+        user_data: Self::UserData,
+        value: Self::Inner,
+    ) -> Result<Self::Output, Self::Error> {
+        use Either::*;
+        match value {
+            Left(l) => L::ContainerType::with(user_data, l).await.map(Left),
+            Right(r) => R::ContainerType::with(user_data, r).await.map(Right),
         }
     }
 }

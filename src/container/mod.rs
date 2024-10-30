@@ -13,10 +13,16 @@ where
     type Key;
     type UserData;
     type Output;
+    type Inner;
 
-    async fn create<K: Into<Self::Key> + Send + Sync>(
+    async fn with_key<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
         key: K,
+    ) -> Result<Self::Output, Self::Error>;
+
+    async fn with(
+        user_data: Self::UserData,
+        inner: Self::Inner,
     ) -> Result<Self::Output, Self::Error>;
 }
 

@@ -45,17 +45,33 @@ where
     type Key = <V::Query as Query>::Key;
     type UserData = <V::Query as Query>::UserData;
     type Output = Self;
+    type Inner = V;
 
-    async fn create<K: Into<Self::Key> + Send + Sync>(
+    async fn with_key<K: Into<Self::Key> + Send + Sync>(
         user_data: Self::UserData,
         key: K,
     ) -> Result<Self, Self::Error> {
         let value = <V::Query as Query>::query(key.into(), &user_data).await?;
-        let up = <<V as HasUp>::Up as HasContainerType>::ContainerType::create(
-            user_data,
-            value.key(),
-        )
-        .await?;
+        let up =
+            <<V as HasUp>::Up as HasContainerType>::ContainerType::with_key(
+                user_data,
+                value.key(),
+            )
+            .await?;
+
+        Ok(Self { value, up })
+    }
+
+    async fn with(
+        user_data: Self::UserData,
+        value: Self::Inner,
+    ) -> Result<Self::Output, Self::Error> {
+        let up =
+            <<V as HasUp>::Up as HasContainerType>::ContainerType::with_key(
+                user_data,
+                value.key(),
+            )
+            .await?;
 
         Ok(Self { value, up })
     }
