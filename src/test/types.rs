@@ -14,7 +14,7 @@
 use async_trait::async_trait;
 use either::Either;
 
-use crate::{query::Query, root::Root, HasQuery, HasUp};
+use crate::{query::Query, HasQuery, HasUp, Root};
 
 #[derive(Debug)]
 pub struct UserData;

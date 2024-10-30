@@ -1,14 +1,17 @@
-use crate::{query::HasQuery, root::Root, Query};
+use crate::{query::HasQuery, Container, HasContainerType, Query};
 use async_trait::async_trait;
-
-use super::{Container, HasContainerType};
+use std::{
+    fmt::Debug,
+    ops::{Deref, DerefMut},
+};
 
 impl<T> HasContainerType for Root<T> {
-    type ContainerType = Fin<T>;
+    type ContainerType = Root<T>;
 }
-pub struct Fin<V>(V);
+pub struct Root<V>(V);
+
 #[async_trait]
-impl<V> Container for Fin<V>
+impl<V> Container for Root<V>
 where
     V: HasQuery,
     V::Query: Query<Output = V>,
@@ -37,5 +40,27 @@ where
         value: Self::Inner,
     ) -> Result<Self::Output, Self::Error> {
         Ok(Root(value))
+    }
+}
+impl<T> Debug for Root<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Root").field(&self.0).finish()
+    }
+}
+
+impl<T> Deref for Root<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> DerefMut for Root<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
