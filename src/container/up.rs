@@ -1,37 +1,39 @@
-use crate::{
-    query::{HasQuery, Query},
-    HasUp,
-};
+use super::{Container, HasContainer};
+use crate::query::{HasQuery, Query};
 use async_trait::async_trait;
 use std::{
     fmt::Debug,
     ops::{Deref, DerefMut},
 };
 
-use super::{Container, HasContainerType};
+pub trait HasUp {
+    type Up;
+    type UpKey;
 
-impl<V> HasContainerType for V
+    fn key(&self) -> Self::UpKey;
+}
+impl<V> HasContainer for V
 where
-    V: HasUp<Up: HasContainerType>,
-    <V::Up as HasContainerType>::ContainerType: Container,
+    V: HasUp<Up: HasContainer>,
+    <V::Up as HasContainer>::Container: Container,
 {
-    type ContainerType = Up<V>;
+    type Container = Up<V>;
 }
 pub struct Up<V>
 where
-    V: HasUp<Up: HasContainerType>,
-    <V::Up as HasContainerType>::ContainerType: Container,
+    V: HasUp<Up: HasContainer>,
+    <V::Up as HasContainer>::Container: Container,
 {
     pub value: V,
-    pub up: <<V::Up as HasContainerType>::ContainerType as Container>::Output,
+    pub up: <<V::Up as HasContainer>::Container as Container>::Output,
 }
 #[async_trait]
 impl<V> Container for Up<V>
 where
-    V: HasUp + HasQuery + HasContainerType + HasQuery + Send + Sync,
+    V: HasUp + HasQuery + HasContainer + HasQuery + Send + Sync,
     V::Query: Query<Output = V> + Send + Sync,
-    V::Up: HasContainerType,
-    <V::Up as HasContainerType>::ContainerType: Container<
+    V::Up: HasContainer,
+    <V::Up as HasContainer>::Container: Container<
         UserData = <V::Query as Query>::UserData,
         Key = <V as HasUp>::UpKey,
         Error = <V::Query as Query>::Error,
@@ -52,12 +54,11 @@ where
         key: K,
     ) -> Result<Self, Self::Error> {
         let value = <V::Query as Query>::query(key.into(), &user_data).await?;
-        let up =
-            <<V as HasUp>::Up as HasContainerType>::ContainerType::with_key(
-                user_data,
-                value.key(),
-            )
-            .await?;
+        let up = <<V as HasUp>::Up as HasContainer>::Container::with_key(
+            user_data,
+            value.key(),
+        )
+        .await?;
 
         Ok(Self { value, up })
     }
@@ -66,12 +67,11 @@ where
         user_data: Self::UserData,
         value: Self::Inner,
     ) -> Result<Self::Output, Self::Error> {
-        let up =
-            <<V as HasUp>::Up as HasContainerType>::ContainerType::with_key(
-                user_data,
-                value.key(),
-            )
-            .await?;
+        let up = <<V as HasUp>::Up as HasContainer>::Container::with_key(
+            user_data,
+            value.key(),
+        )
+        .await?;
 
         Ok(Self { value, up })
     }
@@ -80,8 +80,8 @@ where
 impl<V> Debug for Up<V>
 where
     V: Debug,
-    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
-    <<V::Up as HasContainerType>::ContainerType as Container>::Output: Debug,
+    V: HasUp<Up: HasContainer<Container: Container>>,
+    <<V::Up as HasContainer>::Container as Container>::Output: Debug,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Up")
@@ -93,7 +93,7 @@ where
 
 impl<V> Deref for Up<V>
 where
-    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
+    V: HasUp<Up: HasContainer<Container: Container>>,
 {
     type Target = V;
 
@@ -104,7 +104,7 @@ where
 
 impl<V> DerefMut for Up<V>
 where
-    V: HasUp<Up: HasContainerType<ContainerType: Container>>,
+    V: HasUp<Up: HasContainer<Container: Container>>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.value

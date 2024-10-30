@@ -1,12 +1,12 @@
-use crate::{query::HasQuery, Container, HasContainerType, Query};
+use crate::{query::HasQuery, Container, HasContainer, Query};
 use async_trait::async_trait;
 use std::{
     fmt::Debug,
     ops::{Deref, DerefMut},
 };
 
-impl<T> HasContainerType for Root<T> {
-    type ContainerType = Root<T>;
+impl<T> HasContainer for Root<T> {
+    type Container = Root<T>;
 }
 pub struct Root<V>(V);
 

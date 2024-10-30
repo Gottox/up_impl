@@ -26,6 +26,6 @@ where
     ) -> Result<Self::Output, Self::Error>;
 }
 
-pub trait HasContainerType {
-    type ContainerType: ?Sized;
+pub trait HasContainer {
+    type Container: ?Sized;
 }
