@@ -5,6 +5,7 @@ mod query;
 mod test;
 
 pub use async_trait::async_trait;
+pub use container::branch::OneOf;
 pub use container::root::*;
 pub use container::up::*;
 pub use container::Container;

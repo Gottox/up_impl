@@ -14,6 +14,49 @@ where
     type Container = Branch<L, R>;
 }
 
+pub enum OneOf<L, R> {
+    Left(L),
+    Right(R),
+}
+impl<L, R> std::fmt::Debug for OneOf<L, R>
+where
+    L: std::fmt::Debug,
+    R: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OneOf::Left(l) => write!(f, "Left({:?})", l),
+            OneOf::Right(r) => write!(f, "Right({:?})", r),
+        }
+    }
+}
+
+impl<L, R> Clone for OneOf<L, R>
+where
+    L: Clone,
+    R: Clone,
+{
+    fn clone(&self) -> Self {
+        match self {
+            OneOf::Left(l) => OneOf::Left(l.clone()),
+            OneOf::Right(r) => OneOf::Right(r.clone()),
+        }
+    }
+}
+
+impl<EL, ER, OL, OR> From<Either<EL, ER>> for OneOf<OL, OR>
+where
+    EL: Into<OL>,
+    ER: Into<OR>,
+{
+    fn from(v: Either<EL, ER>) -> Self {
+        match v {
+            Either::Left(l) => OneOf::Left(l.into()),
+            Either::Right(r) => OneOf::Right(r.into()),
+        }
+    }
+}
+
 pub struct Branch<L, R>(L, R)
 where
     L: HasContainer,
@@ -45,7 +88,7 @@ where
     <L::Query as Query>::UserData: Send + Sync,
 {
     type Error = <L::Query as Query>::Error;
-    type Key = Either<<L::Query as Query>::Key, <R::Query as Query>::Key>;
+    type Key = OneOf<<L::Query as Query>::Key, <R::Query as Query>::Key>;
     type UserData = <L::Query as Query>::UserData;
     type Output = Either<
         <L::Container as Container>::Output,
@@ -62,8 +105,12 @@ where
     ) -> Result<Self::Output, Self::Error> {
         use Either::*;
         match key.into() {
-            Left(l) => L::Container::with_key(user_data, l).await.map(Left),
-            Right(r) => R::Container::with_key(user_data, r).await.map(Right),
+            OneOf::Left(l) => {
+                L::Container::with_key(user_data, l).await.map(Left)
+            }
+            OneOf::Right(r) => {
+                R::Container::with_key(user_data, r).await.map(Right)
+            }
         }
     }
 
